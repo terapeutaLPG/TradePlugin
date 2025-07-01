@@ -18,13 +18,21 @@ commands:
     description: Odrzuć prośbę o handel
     usage: /wymianaodrzuc
     permission: tradeplugin.trade
+  wymianahist:
+    description: Zobacz historię handlu (dla adminów)
+    usage: /wymianahist [gracz]
+    permission: tradeplugin.admin
 
 permissions:
   tradeplugin.*:
     description: Dostęp do wszystkich komend pluginu
-    default: true
+    default: op
     children:
       tradeplugin.trade: true
+      tradeplugin.admin: true
   tradeplugin.trade:
     description: Pozwala na handel z innymi graczami
     default: true
+  tradeplugin.admin:
+    description: Dostęp do historii handlu i komend administracyjnych
+    default: op

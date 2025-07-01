@@ -1,4 +1,26 @@
-# TradePlugin - Historia zmian
+# # TradePlugin - Historia zmian
+
+## Wersja 1.0-SNAPSHOT (2025-07-01) - HISTORIA HANDLU I POPRAWKI UX
+
+### ✅ NAJNOWSZE FUNKCJE (Ostatnia aktualizacja):
+
+1. **System historii handlu** - DODANY ✅
+
+   - Komenda `/wymianahist` dla adminów (uprawnienie: `tradeplugin.admin`)
+   - GUI podobne do InventoryRollback z listą wszystkich wymian
+   - Filtrowanie historii po graczach: `/wymianahist nazwa_gracza`
+   - Szczegółowy widok każdej wymiany z wszystkimi przedmiotami
+   - Automatyczne zapisywanie do `trade_history.yml`
+   - Automatyczne usuwanie historii po 30 dniach
+   - Serializacja przedmiotów z zabezpieczeniami
+
+2. **Automatyczne zamykanie GUI** - NAPRAWIONE ✅
+
+   - Po zakończeniu handlu okno automatycznie się zamyka dla obu graczy
+   - Implementowane w `completeTrade()` w InventoryListener
+   - Eliminuje potrzebę ręcznego zamykania okna
+
+3. **Usunięto przycisk "Potwierdź handel"** - USUNIĘTE ✅ - Historia zmian
 
 ## Wersja 1.0-SNAPSHOT (2025-07-01) - FINALNE ULEPSZENIA UX
 

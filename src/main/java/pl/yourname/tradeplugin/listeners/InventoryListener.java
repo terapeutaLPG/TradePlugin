@@ -1,6 +1,9 @@
 package pl.yourname.tradeplugin.listeners;
 
+import java.util.List;
+
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,6 +15,8 @@ import org.bukkit.inventory.ItemStack;
 
 import pl.yourname.tradeplugin.TradePlugin;
 import pl.yourname.tradeplugin.gui.TradeGUI;
+import pl.yourname.tradeplugin.gui.TradeHistoryGUI;
+import pl.yourname.tradeplugin.models.TradeHistoryEntry;
 import pl.yourname.tradeplugin.models.TradeSession;
 
 public class InventoryListener implements Listener {
@@ -30,6 +35,14 @@ public class InventoryListener implements Listener {
 
         Player player = (Player) event.getWhoClicked();
         TradeSession session = plugin.getTradeManager().getPlayerTradeSession(player);
+
+        // Sprawdź czy to GUI historii handlu - użyjemy prostego rozpoznawania na podstawie tego, czy gracz nie jest w sesji handlu
+        // i inventory ma odpowiedni rozmiar
+        if (session == null && TradeHistoryGUI.isHistoryGUI(event.getInventory())) {
+            event.setCancelled(true);
+            handleHistoryGUIClick(player, event);
+            return;
+        }
 
         if (session == null) {
             return; // Gracz nie jest w handlu
@@ -289,6 +302,13 @@ public class InventoryListener implements Listener {
         ItemStack[] player1Items = session.getPlayerItems(player1).clone();
         ItemStack[] player2Items = session.getPlayerItems(player2).clone();
 
+        // Zapisz handel do historii
+        plugin.getHistoryManager().addTradeEntry(
+                player1.getName(), player1.getUniqueId(),
+                player2.getName(), player2.getUniqueId(),
+                player1Items, player2Items
+        );
+
         // Wykonaj wymianę przedmiotów - każdy gracz dostaje przedmioty DRUGIEGO gracza
         for (ItemStack item : player2Items) { // Gracz 1 dostaje przedmioty gracza 2
             if (item != null && !item.getType().isAir()) {
@@ -306,7 +326,11 @@ public class InventoryListener implements Listener {
         player1.sendMessage(ChatColor.GREEN + "Handel zakończony pomyślnie!");
         player2.sendMessage(ChatColor.GREEN + "Handel zakończony pomyślnie!");
 
-        // Usuń sesję handlu (GUI pozostaje otwarte)
+        // Zamknij GUI dla obydwu graczy po zakończeniu handlu
+        player1.closeInventory();
+        player2.closeInventory();
+
+        // Usuń sesję handlu
         plugin.getTradeManager().cancelTrade(session);
     }
 
@@ -341,5 +365,43 @@ public class InventoryListener implements Listener {
     private void updateBothPlayersGUI(TradeSession session) {
         TradeGUI.updateTradeGUI(session, session.getPlayer1());
         TradeGUI.updateTradeGUI(session, session.getPlayer2());
+    }
+
+    private void handleHistoryGUIClick(Player player, InventoryClickEvent event) {
+        int slot = event.getRawSlot();
+        ItemStack clickedItem = event.getCurrentItem();
+
+        if (clickedItem == null || clickedItem.getType().isAir()) {
+            return;
+        }
+
+        // Sprawdź czy to GUI szczegółów handlu
+        if (TradeHistoryGUI.isDetailGUI(event.getInventory())) {
+            // W GUI szczegółów tylko przycisk powrotu (slot 49)
+            if (slot == 49 && clickedItem.getType() == Material.ARROW) {
+                // Powrót do historii
+                List<TradeHistoryEntry> history = plugin.getHistoryManager().getHistory();
+                TradeHistoryGUI.openHistoryGUI(player, history, plugin);
+            }
+            return;
+        }
+
+        // GUI głównej historii - sprawdź rozmiar i typ inventory
+        if (event.getInventory().getSize() <= 54) {
+            // Sprawdź czy to przycisk zamknięcia
+            if (clickedItem.getType() == Material.BARRIER) {
+                player.closeInventory();
+                return;
+            }
+
+            // Sprawdź czy to item historii (książka)
+            if (clickedItem.getType() == Material.WRITABLE_BOOK) {
+                List<TradeHistoryEntry> history = plugin.getHistoryManager().getHistory();
+                if (slot >= 0 && slot < history.size()) {
+                    TradeHistoryEntry entry = history.get(slot);
+                    TradeHistoryGUI.openTradeDetailGUI(player, entry, plugin);
+                }
+            }
+        }
     }
 }
