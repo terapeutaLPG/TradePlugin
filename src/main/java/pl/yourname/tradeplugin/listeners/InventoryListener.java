@@ -83,12 +83,27 @@ public class InventoryListener implements Listener {
             return;
         }
 
-        // Anuluj przeciąganie w GUI handlu
+        // Sprawdź czy drag jest tylko w dozwolonych slotach
+        boolean allowDrag = true;
         for (int slot : event.getRawSlots()) {
-            if (slot < 54) {
-                event.setCancelled(true);
-                break;
+            if (slot < 54) { // Slot w GUI handlu
+                if (!canPlayerModifySlot(player, session, slot)) {
+                    allowDrag = false;
+                    break;
+                }
             }
+        }
+
+        if (!allowDrag) {
+            event.setCancelled(true);
+        } else {
+            // Pozwól na drag, ale zresetuj gotowość i odśwież po dragowaniu
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                session.setPlayerReady(player, false);
+                session.setPlayerReady(session.getOtherPlayer(player), false);
+                syncInventoryToSession(session);
+                updateBothPlayersGUI(session);
+            }, 1L);
         }
     }
 
@@ -201,34 +216,55 @@ public class InventoryListener implements Listener {
         Player player1 = session.getPlayer1();
         Player player2 = session.getPlayer2();
 
+        // Rozpocznij countdown w sesji
+        session.startCountdown();
+
         // Wyślij wiadomość o rozpoczęciu odliczania
         player1.sendMessage(ChatColor.GOLD + "Obaj gracze są gotowi! Automatyczna akceptacja za 4 sekundy...");
         player2.sendMessage(ChatColor.GOLD + "Obaj gracze są gotowi! Automatyczna akceptacja za 4 sekundy...");
 
-        // Rozpocznij odliczanie
-        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-            // Sprawdź czy sesja nadal istnieje i obaj gracze są gotowi
-            if (plugin.getTradeManager().getPlayerTradeSession(player1) != session
-                    || plugin.getTradeManager().getPlayerTradeSession(player2) != session) {
-                return; // Handel został anulowany
-            }
+        // Odśwież GUI aby pokazać countdown
+        updateBothPlayersGUI(session);
 
-            if (!session.areBothPlayersReady()) {
-                return; // Ktoś przestał być gotowy
-            }
+        // Uruchom zadanie countdown'u z odświeżaniem co sekundę
+        runCountdownTask(session, 4);
+    }
 
-            // Automatycznie potwierdź dla obydwu graczy
+    private void runCountdownTask(TradeSession session, int secondsLeft) {
+        Player player1 = session.getPlayer1();
+        Player player2 = session.getPlayer2();
+
+        // Sprawdź czy sesja nadal istnieje i countdown jest aktywny
+        if (plugin.getTradeManager().getPlayerTradeSession(player1) != session
+                || plugin.getTradeManager().getPlayerTradeSession(player2) != session
+                || !session.isCountdownActive()
+                || !session.areBothPlayersReady()) {
+
+            // Anuluj countdown
+            session.setCountdownActive(false);
+            updateBothPlayersGUI(session);
+            return;
+        }
+
+        // Ustaw sekundy w sesji
+        session.setCountdownSeconds(secondsLeft);
+        updateBothPlayersGUI(session);
+
+        if (secondsLeft <= 0) {
+            // Countdown skończony - wykonaj handel
             session.setPlayerConfirmed(player1, true);
             session.setPlayerConfirmed(player2, true);
 
-            // Wyślij wiadomości
             player1.sendMessage(ChatColor.GREEN + "Automatyczne potwierdzenie handlu!");
             player2.sendMessage(ChatColor.GREEN + "Automatyczne potwierdzenie handlu!");
 
-            // Zakończ handel
             completeTrade(session);
-
-        }, 80L); // 4 sekundy (80 ticks)
+        } else {
+            // Kontynuuj countdown za sekundę
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                runCountdownTask(session, secondsLeft - 1);
+            }, 20L); // 20 ticks = 1 sekunda
+        }
     }
 
     private void handleAcceptButton(Player player, TradeSession session) {

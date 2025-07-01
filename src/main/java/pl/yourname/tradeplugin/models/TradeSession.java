@@ -18,6 +18,8 @@ public class TradeSession {
     private boolean player1Confirmed;
     private boolean player2Confirmed;
     private final long createdTime;
+    private int countdownSeconds; // -1 = brak countdown'u, 0-4 = sekundy pozostałe
+    private boolean countdownActive;
 
     public TradeSession(Player player1, Player player2) {
         this.sessionId = UUID.randomUUID();
@@ -30,6 +32,8 @@ public class TradeSession {
         this.player1Confirmed = false;
         this.player2Confirmed = false;
         this.createdTime = System.currentTimeMillis();
+        this.countdownSeconds = -1; // Brak countdown'u na początku
+        this.countdownActive = false;
     }
 
     public UUID getSessionId() {
@@ -99,6 +103,8 @@ public class TradeSession {
         this.player2Ready = false;
         this.player1Confirmed = false;
         this.player2Confirmed = false;
+        this.countdownSeconds = -1; // Zresetuj countdown
+        this.countdownActive = false;
     }
 
     public long getCreatedTime() {
@@ -113,5 +119,36 @@ public class TradeSession {
         ItemStack[] items = getPlayerItems(player);
         Arrays.fill(items, null);
         resetReadiness();
+    }
+
+    // Metody do obsługi countdown'u
+    public int getCountdownSeconds() {
+        return countdownSeconds;
+    }
+
+    public void setCountdownSeconds(int seconds) {
+        this.countdownSeconds = seconds;
+    }
+
+    public boolean isCountdownActive() {
+        return countdownActive;
+    }
+
+    public void setCountdownActive(boolean active) {
+        this.countdownActive = active;
+        if (!active) {
+            this.countdownSeconds = -1;
+        }
+    }
+
+    public void startCountdown() {
+        this.countdownActive = true;
+        this.countdownSeconds = 4;
+    }
+
+    public void decrementCountdown() {
+        if (countdownActive && countdownSeconds > 0) {
+            countdownSeconds--;
+        }
     }
 }

@@ -30,6 +30,7 @@ public class TradeGUI {
 
     // Separatory (środkowa kolumna)
     private static final int[] SEPARATOR_SLOTS = {4, 13, 22, 31, 40, 49};
+    private static final int COUNTDOWN_SLOT = 22; // Środkowy slot dla countdown'u
 
     // Przyciski kontrolne
     private static final int PLAYER1_READY_SLOT = 36;
@@ -50,7 +51,9 @@ public class TradeGUI {
             // Ustaw separatory
             ItemStack separator = createItem(Material.GRAY_STAINED_GLASS_PANE, ChatColor.GRAY + "Separator", null);
             for (int slot : SEPARATOR_SLOTS) {
-                inventory.setItem(slot, separator);
+                if (slot != COUNTDOWN_SLOT) { // Nie ustawiaj separatora na slocie countdown'u
+                    inventory.setItem(slot, separator);
+                }
             }
 
             // Dodaj przedmioty z sesji
@@ -175,6 +178,39 @@ public class TradeGUI {
                     ChatColor.GRAY + "Czekaj na gotowość",
                     Arrays.asList(ChatColor.GRAY + "Obaj gracze muszą być gotowi"));
             inventory.setItem(ACCEPT_SLOT, blockedButton);
+        }
+
+        // Dodaj countdown w środkowym slocie
+        updateCountdownDisplay(inventory, session);
+    }
+
+    private static void updateCountdownDisplay(Inventory inventory, TradeSession session) {
+        if (session.isCountdownActive() && session.getCountdownSeconds() >= 0) {
+            // Aktywny countdown
+            int seconds = session.getCountdownSeconds();
+            Material material = seconds == 0 ? Material.LIME_CONCRETE : Material.ORANGE_CONCRETE;
+            String title = seconds == 0
+                    ? ChatColor.GREEN + "WYMIANA!"
+                    : ChatColor.GOLD + "Automatyczna akceptacja: " + seconds + "s";
+
+            ItemStack countdownItem = createItem(material, title,
+                    Arrays.asList(
+                            ChatColor.GRAY + "Handel zostanie automatycznie",
+                            ChatColor.GRAY + "zaakceptowany za " + seconds + " sekund",
+                            ChatColor.YELLOW + "Możesz anulować resetując gotowość"
+                    ));
+            inventory.setItem(COUNTDOWN_SLOT, countdownItem);
+        } else if (session.areBothPlayersReady()) {
+            // Obaj gotowi, ale countdown jeszcze nie rozpoczęty
+            ItemStack readyItem = createItem(Material.YELLOW_CONCRETE,
+                    ChatColor.YELLOW + "Obaj gracze gotowi!",
+                    Arrays.asList(ChatColor.GRAY + "Rozpoczynanie automatycznej akceptacji..."));
+            inventory.setItem(COUNTDOWN_SLOT, readyItem);
+        } else {
+            // Normalna separatka gdy nie ma countdown'u
+            ItemStack separator = createItem(Material.GRAY_STAINED_GLASS_PANE,
+                    ChatColor.GRAY + "Separator", null);
+            inventory.setItem(COUNTDOWN_SLOT, separator);
         }
     }
 
