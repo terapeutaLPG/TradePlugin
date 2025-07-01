@@ -163,20 +163,25 @@ public class TradeGUI {
                 Arrays.asList(ChatColor.GRAY + "Kliknij aby anulować handel"));
         inventory.setItem(CANCEL_SLOT, cancelButton);
 
-        // Przycisk akceptacji (tylko jeśli obaj gracze są gotowi)
+        // Slot informacyjny zamiast przycisku akceptacji
         if (session.areBothPlayersReady()) {
-            boolean isConfirmed = session.isPlayerConfirmed(viewer);
-            ItemStack acceptButton = createItem(
-                    isConfirmed ? Material.EMERALD_BLOCK : Material.GOLD_BLOCK,
-                    isConfirmed ? ChatColor.GREEN + "Potwierdzono!" : ChatColor.YELLOW + "Potwierdź handel",
-                    Arrays.asList(ChatColor.GRAY + "Kliknij aby potwierdzić handel")
-            );
-            inventory.setItem(ACCEPT_SLOT, acceptButton);
+            // Informacja o automatycznej akceptacji
+            ItemStack infoButton = createItem(Material.CLOCK,
+                    ChatColor.GOLD + "Automatyczna akceptacja",
+                    Arrays.asList(
+                            ChatColor.GRAY + "Handel zostanie automatycznie",
+                            ChatColor.GRAY + "zaakceptowany za 4 sekundy",
+                            ChatColor.YELLOW + "po gotowości obu graczy"
+                    ));
+            inventory.setItem(ACCEPT_SLOT, infoButton);
         } else {
-            // Jeśli nie obaj gracze są gotowi, pokaż zablokowany przycisk
+            // Jeśli nie obaj gracze są gotowi, pokaż informację
             ItemStack blockedButton = createItem(Material.GRAY_CONCRETE,
                     ChatColor.GRAY + "Czekaj na gotowość",
-                    Arrays.asList(ChatColor.GRAY + "Obaj gracze muszą być gotowi"));
+                    Arrays.asList(
+                            ChatColor.GRAY + "Obaj gracze muszą być gotowi",
+                            ChatColor.YELLOW + "Następnie automatyczna akceptacja za 4s"
+                    ));
             inventory.setItem(ACCEPT_SLOT, blockedButton);
         }
 

@@ -49,10 +49,6 @@ public class InventoryListener implements Listener {
                 event.setCancelled(true);
                 handleReadyButton(player, session);
                 return;
-            } else if (TradeGUI.isAcceptButton(slot)) {
-                event.setCancelled(true);
-                handleAcceptButton(player, session);
-                return;
             } else if (TradeGUI.isCancelButton(slot)) {
                 event.setCancelled(true);
                 handleCancelButton(player, session);
@@ -250,6 +246,17 @@ public class InventoryListener implements Listener {
         session.setCountdownSeconds(secondsLeft);
         updateBothPlayersGUI(session);
 
+        // Odtwórz dźwięk countdown'u
+        if (secondsLeft > 0) {
+            // Dźwięk tick podczas odliczania
+            player1.playSound(player1.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.2f);
+            player2.playSound(player2.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.2f);
+        } else {
+            // Dźwięk sukcesu na końcu
+            player1.playSound(player1.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+            player2.playSound(player2.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+        }
+
         if (secondsLeft <= 0) {
             // Countdown skończony - wykonaj handel
             session.setPlayerConfirmed(player1, true);
@@ -267,34 +274,6 @@ public class InventoryListener implements Listener {
         }
     }
 
-    private void handleAcceptButton(Player player, TradeSession session) {
-        if (!session.areBothPlayersReady()) {
-            player.sendMessage(ChatColor.RED + "Obaj gracze muszą być gotowi!");
-            return;
-        }
-
-        boolean currentConfirmed = session.isPlayerConfirmed(player);
-        session.setPlayerConfirmed(player, !currentConfirmed);
-
-        Player otherPlayer = session.getOtherPlayer(player);
-
-        if (!currentConfirmed) {
-            player.sendMessage(ChatColor.GREEN + "Potwierdziłeś handel!");
-            otherPlayer.sendMessage(ChatColor.YELLOW + player.getName() + " potwierdził handel!");
-
-            // Sprawdź czy obaj gracze potwierdzili
-            if (session.areBothPlayersConfirmed()) {
-                completeTrade(session);
-                return;
-            }
-        } else {
-            player.sendMessage(ChatColor.RED + "Anulowałeś potwierdzenie!");
-            otherPlayer.sendMessage(ChatColor.YELLOW + player.getName() + " anulował potwierdzenie!");
-        }
-
-        updateBothPlayersGUI(session);
-    }
-
     private void handleCancelButton(Player player, TradeSession session) {
         cancelTrade(session, player.getName() + " anulował handel");
     }
@@ -306,13 +285,9 @@ public class InventoryListener implements Listener {
         // Synchronizuj najpierw przedmioty z inventory
         syncInventoryToSession(session);
 
-        // Pobierz przedmioty do wymiany (PRZED zamknięciem GUI)
+        // Pobierz przedmioty do wymiany
         ItemStack[] player1Items = session.getPlayerItems(player1).clone();
         ItemStack[] player2Items = session.getPlayerItems(player2).clone();
-
-        // Zamknij GUI dla obydwu graczy
-        player1.closeInventory();
-        player2.closeInventory();
 
         // Wykonaj wymianę przedmiotów - każdy gracz dostaje przedmioty DRUGIEGO gracza
         for (ItemStack item : player2Items) { // Gracz 1 dostaje przedmioty gracza 2
@@ -331,7 +306,7 @@ public class InventoryListener implements Listener {
         player1.sendMessage(ChatColor.GREEN + "Handel zakończony pomyślnie!");
         player2.sendMessage(ChatColor.GREEN + "Handel zakończony pomyślnie!");
 
-        // Usuń sesję handlu
+        // Usuń sesję handlu (GUI pozostaje otwarte)
         plugin.getTradeManager().cancelTrade(session);
     }
 
