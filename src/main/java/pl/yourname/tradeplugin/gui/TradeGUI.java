@@ -19,12 +19,12 @@ public class TradeGUI {
     private static final String INVENTORY_TITLE = ChatColor.DARK_GREEN + "Handel";
 
     // Sloty dla przedmiotów gracza 1 (lewa strona)
-    private static final int[] PLAYER1_SLOTS = {
+    public static final int[] PLAYER1_SLOTS = {
         0, 1, 2, 3, 9, 10, 11, 12, 18, 19, 20, 21, 27, 28, 29, 30
     };
 
     // Sloty dla przedmiotów gracza 2 (prawa strona)
-    private static final int[] PLAYER2_SLOTS = {
+    public static final int[] PLAYER2_SLOTS = {
         5, 6, 7, 8, 14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34, 35
     };
 

@@ -10,9 +10,9 @@ commands:
     description: Rozpocznij handel z innym graczem
     usage: /wymiana <gracz>
     permission: tradeplugin.trade
-  wymianaakceptuj:
+  wymianazaakceptuj:
     description: Zaakceptuj prośbę o handel
-    usage: /wymianaakceptuj
+    usage: /wymianazaakceptuj
     permission: tradeplugin.trade
   wymianaodrzuc:
     description: Odrzuć prośbę o handel

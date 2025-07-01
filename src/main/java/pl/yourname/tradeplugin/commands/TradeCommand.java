@@ -7,6 +7,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import pl.yourname.tradeplugin.TradePlugin;
 import pl.yourname.tradeplugin.gui.TradeGUI;
 import pl.yourname.tradeplugin.models.TradeRequest;
@@ -33,7 +37,7 @@ public class TradeCommand implements CommandExecutor {
             switch (command.getName().toLowerCase()) {
                 case "wymiana":
                     return handleTradeCommand(player, args);
-                case "wymianaakceptuj":
+                case "wymianazaakceptuj":
                     return handleTradeAccept(player);
                 case "wymianaodrzuc":
                     return handleTradeDeny(player);
@@ -101,7 +105,9 @@ public class TradeCommand implements CommandExecutor {
         // Wyślij wiadomości
         player.sendMessage(ChatColor.GREEN + "Wysłano prośbę o handel do " + target.getName());
         target.sendMessage(ChatColor.YELLOW + player.getName() + " chce z Tobą handlować!");
-        target.sendMessage(ChatColor.YELLOW + "Wpisz " + ChatColor.GREEN + "/wymianaakceptuj" + ChatColor.YELLOW + " aby zaakceptować lub " + ChatColor.RED + "/wymianaodrzuc" + ChatColor.YELLOW + " aby odrzucić");
+
+        // Wyślij klikalną wiadomość
+        sendClickableTradeMessage(target);
 
         return true;
     }
@@ -161,5 +167,31 @@ public class TradeCommand implements CommandExecutor {
         }
 
         return true;
+    }
+
+    private void sendClickableTradeMessage(Player player) {
+        try {
+            // Utwórz klikalną wiadomość z przyciskami
+            TextComponent message = new TextComponent(ChatColor.YELLOW + "Kliknij: ");
+
+            TextComponent acceptButton = new TextComponent(ChatColor.GREEN + "[ZAAKCEPTUJ]");
+            acceptButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/wymianazaakceptuj"));
+            acceptButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Kliknij aby zaakceptować handel").create()));
+
+            TextComponent separator = new TextComponent(ChatColor.GRAY + " lub ");
+
+            TextComponent denyButton = new TextComponent(ChatColor.RED + "[ODRZUĆ]");
+            denyButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/wymianaodrzuc"));
+            denyButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Kliknij aby odrzucić handel").create()));
+
+            message.addExtra(acceptButton);
+            message.addExtra(separator);
+            message.addExtra(denyButton);
+
+            player.spigot().sendMessage(message);
+        } catch (Exception e) {
+            // Fallback do zwykłej wiadomości jeśli coś pójdzie nie tak
+            player.sendMessage(ChatColor.YELLOW + "Wpisz " + ChatColor.GREEN + "/wymianazaakceptuj" + ChatColor.YELLOW + " aby zaakceptować lub " + ChatColor.RED + "/wymianaodrzuc" + ChatColor.YELLOW + " aby odrzucić");
+        }
     }
 }

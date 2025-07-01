@@ -21,8 +21,8 @@ public class TradePlugin extends JavaPlugin {
         if (getCommand("wymiana") != null) {
             getCommand("wymiana").setExecutor(tradeCommand);
         }
-        if (getCommand("wymianaakceptuj") != null) {
-            getCommand("wymianaakceptuj").setExecutor(tradeCommand);
+        if (getCommand("wymianazaakceptuj") != null) {
+            getCommand("wymianazaakceptuj").setExecutor(tradeCommand);
         }
         if (getCommand("wymianaodrzuc") != null) {
             getCommand("wymianaodrzuc").setExecutor(tradeCommand);

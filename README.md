@@ -1,6 +1,10 @@
-# TradePlugin
+# TradePlugin## Komendy
 
-Plugin do handlu między graczami dla serwerów Minecraft Bukkit/Spigot.
+| Komenda              | Opis                              | Uprawnienie         |
+| -------------------- | --------------------------------- | ------------------- | ------------------------------------------------------------------- |
+| `/wymiana <gracz>`   | Rozpocznij handel z innym graczem | `tradeplugin.trade` |
+| `/wymianazaakceptuj` | Zaakceptuj prośbę o handel        | `tradeplugin.trade` |
+| `/wymianaodrzuc`     | Odrzuć prośbę o handel            | `tradeplugin.trade` | gin do handlu między graczami dla serwerów Minecraft Bukkit/Spigot. |
 
 ## Funkcje
 
@@ -29,8 +33,8 @@ Plugin do handlu między graczami dla serwerów Minecraft Bukkit/Spigot.
 ## Jak używać
 
 1. **Rozpoczęcie handlu**: Użyj komendy `/wymiana <nick_gracza>` aby wysłać prośbę o handel
-2. **Akceptacja**: Gracz docelowy używa `/wymianaakceptuj` aby zaakceptować lub `/wymianaodrzuc` aby odrzucić
-3. **Dodawanie przedmiotów**: Po otwarciu GUI, przeciągnij przedmioty do swoich slotów
+2. **Akceptacja**: Gracz docelowy używa `/wymianazaakceptuj` aby zaakceptować lub `/wymianaodrzuc` aby odrzucić (lub kliknie w chat!)
+3. **Dodawanie przedmiotów**: Po otwarciu GUI, przeciągnij przedmioty normalnie do slotów handlu
 4. **Potwierdzenie gotowości**: Kliknij zielony/czerwony przycisk aby zaznaczyć gotowość
 5. **Finalizacja**: Gdy obaj gracze są gotowi, kliknij przycisk potwierdzenia
 6. **Zakończenie**: Handel zostanie wykonany automatycznie po potwierdzeniu przez obydwu graczy

@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import pl.yourname.tradeplugin.TradePlugin;
@@ -43,24 +44,28 @@ public class InventoryListener implements Listener {
 
         // Jeśli kliknięcie w górnym inventory (GUI handlu)
         if (slot < 54) {
-            event.setCancelled(true); // Zawsze anuluj standardowe zachowanie
-
             // Obsłuż kliknięcia w przyciski kontrolne
             if (TradeGUI.isReadyButton(slot)) {
+                event.setCancelled(true);
                 handleReadyButton(player, session);
                 return;
             } else if (TradeGUI.isAcceptButton(slot)) {
+                event.setCancelled(true);
                 handleAcceptButton(player, session);
                 return;
             } else if (TradeGUI.isCancelButton(slot)) {
+                event.setCancelled(true);
                 handleCancelButton(player, session);
                 return;
             } else if (canPlayerModifySlot(player, session, slot)) {
-                // Pozwól graczowi modyfikować swoje sloty handlu
-                handleTradeSlotInteraction(player, session, slot, event);
+                // Pozwól na naturalne przenoszenie przedmiotów
+                // NIE anulujemy eventu - pozwalamy na standardową obsługę
+                handleTradeSlotUpdate(player, session, slot);
                 return;
+            } else {
+                // Zablokuj kliknięcia w inne sloty (separatory, etykiety itp.)
+                event.setCancelled(true);
             }
-            // Wszystkie inne kliknięcia w GUI są zablokowane
         }
         // Kliknięcia w dolnym inventory (ekwipunek gracza) są dozwolone
     }
@@ -124,39 +129,44 @@ public class InventoryListener implements Listener {
         return false;
     }
 
-    private void handleTradeSlotInteraction(Player player, TradeSession session, int slot, InventoryClickEvent event) {
-        boolean isPlayer1 = player.equals(session.getPlayer1());
-        int tradeSlotIndex = TradeGUI.getTradeSlotIndex(slot, isPlayer1);
+    private void handleTradeSlotUpdate(Player player, TradeSession session, int slot) {
+        // Po każdej zmianie w slotach handlu, resetuj status gotowości
+        session.setPlayerReady(player, false);
+        session.setPlayerReady(session.getOtherPlayer(player), false);
 
-        if (tradeSlotIndex == -1) {
+        // Odśwież GUI z opóźnieniem, żeby standardowy event się wykonał
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            // Synchronizuj przedmioty z inventory do sesji
+            syncInventoryToSession(session);
+            updateBothPlayersGUI(session);
+        }, 1L);
+    }
+
+    private void syncInventoryToSession(TradeSession session) {
+        Player player1 = session.getPlayer1();
+        Player player2 = session.getPlayer2();
+
+        // Sprawdź czy gracze mają otwarte GUI
+        if (player1.getOpenInventory().getTopInventory().getSize() != 54
+                || player2.getOpenInventory().getTopInventory().getSize() != 54) {
             return;
         }
 
-        ItemStack cursorItem = event.getCursor();
-        ItemStack clickedItem = event.getCurrentItem();
+        Inventory inv1 = player1.getOpenInventory().getTopInventory();
+        Inventory inv2 = player2.getOpenInventory().getTopInventory();
 
-        // Bezpieczne kopiowanie, jeśli przedmioty nie są null
-        ItemStack cursorCopy = (cursorItem != null && !cursorItem.getType().isAir()) ? cursorItem.clone() : null;
-        ItemStack clickedCopy = (clickedItem != null && !clickedItem.getType().isAir()) ? clickedItem.clone() : null;
+        // Synchronizuj przedmioty gracza 1
+        ItemStack[] player1Items = session.getPlayerItems(player1);
+        for (int i = 0; i < TradeGUI.PLAYER1_SLOTS.length && i < player1Items.length; i++) {
+            ItemStack item = inv1.getItem(TradeGUI.PLAYER1_SLOTS[i]);
+            player1Items[i] = (item != null && !item.getType().isAir()) ? item.clone() : null;
+        }
 
-        if (cursorCopy != null) {
-            // Gracz ma przedmiot na kursorze - chce go włożyć
-            session.setPlayerItem(player, tradeSlotIndex, cursorCopy);
-
-            // Ustaw przedmiot na kursorze jako ten ze slotu (może być null)
-            plugin.getServer().getScheduler().runTask(plugin, () -> {
-                player.setItemOnCursor(clickedCopy);
-                updateBothPlayersGUI(session);
-            });
-
-        } else if (clickedCopy != null) {
-            // Gracz chce wziąć przedmiot ze slotu
-            session.setPlayerItem(player, tradeSlotIndex, null);
-
-            plugin.getServer().getScheduler().runTask(plugin, () -> {
-                player.setItemOnCursor(clickedCopy);
-                updateBothPlayersGUI(session);
-            });
+        // Synchronizuj przedmioty gracza 2  
+        ItemStack[] player2Items = session.getPlayerItems(player2);
+        for (int i = 0; i < TradeGUI.PLAYER2_SLOTS.length && i < player2Items.length; i++) {
+            ItemStack item = inv2.getItem(TradeGUI.PLAYER2_SLOTS[i]);
+            player2Items[i] = (item != null && !item.getType().isAir()) ? item.clone() : null;
         }
     }
 
