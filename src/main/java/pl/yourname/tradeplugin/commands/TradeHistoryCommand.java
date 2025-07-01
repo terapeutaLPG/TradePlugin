@@ -42,6 +42,7 @@ public class TradeHistoryCommand implements CommandExecutor {
                 return true;
             }
 
+            player.sendMessage(ChatColor.GREEN + "Pokazuję wszystkie wymiany (" + history.size() + " zapisów)");
             TradeHistoryGUI.openHistoryGUI(player, history, plugin);
         } else if (args.length == 1) {
             // Pokaż historię dla konkretnego gracza
@@ -49,10 +50,12 @@ public class TradeHistoryCommand implements CommandExecutor {
             List<TradeHistoryEntry> history = plugin.getHistoryManager().getHistoryForPlayer(targetPlayer);
 
             if (history.isEmpty()) {
-                player.sendMessage(ChatColor.YELLOW + "Brak historii handlu dla gracza: " + targetPlayer);
+                player.sendMessage(ChatColor.YELLOW + "Brak historii handlu dla gracza: " + ChatColor.WHITE + targetPlayer);
                 return true;
             }
 
+            player.sendMessage(ChatColor.GREEN + "Pokazuję wymiany gracza " + ChatColor.WHITE + targetPlayer
+                    + ChatColor.GREEN + " (" + history.size() + " zapisów)");
             TradeHistoryGUI.openHistoryGUI(player, history, plugin);
         } else {
             player.sendMessage(ChatColor.RED + "Użycie: /wymianahist [gracz]");

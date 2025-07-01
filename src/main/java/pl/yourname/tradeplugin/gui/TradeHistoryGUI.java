@@ -48,53 +48,70 @@ public class TradeHistoryGUI {
     public static void openTradeDetailGUI(Player player, TradeHistoryEntry entry, TradePlugin plugin) {
         Inventory inventory = Bukkit.createInventory(null, 54, DETAIL_TITLE);
 
-        // Lewy górny róg - informacje o handlu
+        // Górny środek - informacje o handlu
         ItemStack infoItem = createItem(Material.BOOK,
                 ChatColor.GOLD + "Informacje o handlu",
                 Arrays.asList(
                         ChatColor.GRAY + "Data: " + entry.getFormattedTimestamp(),
                         ChatColor.BLUE + "Gracz 1: " + entry.getPlayer1Name(),
-                        ChatColor.GREEN + "Gracz 2: " + entry.getPlayer2Name(),
+                        ChatColor.RED + "Gracz 2: " + entry.getPlayer2Name(),
                         "",
                         ChatColor.YELLOW + "ID: " + entry.getEntryId().toString().substring(0, 8) + "..."
                 ));
         inventory.setItem(4, infoItem);
 
-        // Przedmioty gracza 1 (lewa strona)
-        ItemStack[] player1Items = entry.getPlayer1Items();
-        ItemStack player1Label = createItem(Material.PLAYER_HEAD,
+        // Etykieta gracza 1 (lewa strona - niebieska)
+        ItemStack player1Label = createItem(Material.BLUE_CONCRETE,
                 ChatColor.BLUE + entry.getPlayer1Name() + " oddał:",
-                Arrays.asList(ChatColor.GRAY + "Przedmioty gracza " + entry.getPlayer1Name()));
-        inventory.setItem(9, player1Label);
+                Arrays.asList(ChatColor.GRAY + "Przedmioty po lewej stronie"));
+        inventory.setItem(0, player1Label);
 
-        int[] player1Slots = {10, 11, 12, 19, 20, 21, 28, 29, 30, 37, 38, 39};
+        // Etykieta gracza 2 (prawa strona - czerwona)
+        ItemStack player2Label = createItem(Material.RED_CONCRETE,
+                ChatColor.RED + entry.getPlayer2Name() + " oddał:",
+                Arrays.asList(ChatColor.GRAY + "Przedmioty po prawej stronie"));
+        inventory.setItem(8, player2Label);
+
+        // Przedmioty gracza 1 (lewa strona - sloty 1-3, 9-12, 18-21, 27-30)
+        ItemStack[] player1Items = entry.getPlayer1Items();
+        int[] player1Slots = {1, 2, 3, 9, 10, 11, 12, 18, 19, 20, 21, 27, 28, 29, 30};
         for (int i = 0; i < Math.min(player1Items.length, player1Slots.length); i++) {
             if (player1Items[i] != null && !player1Items[i].getType().isAir()) {
                 inventory.setItem(player1Slots[i], player1Items[i]);
             }
         }
 
-        // Przedmioty gracza 2 (prawa strona)
+        // Przedmioty gracza 2 (prawa strona - sloty 5-7, 14-17, 23-26, 32-35)
         ItemStack[] player2Items = entry.getPlayer2Items();
-        ItemStack player2Label = createItem(Material.PLAYER_HEAD,
-                ChatColor.GREEN + entry.getPlayer2Name() + " oddał:",
-                Arrays.asList(ChatColor.GRAY + "Przedmioty gracza " + entry.getPlayer2Name()));
-        inventory.setItem(15, player2Label);
-
-        int[] player2Slots = {16, 17, 18, 25, 26, 27, 34, 35, 36, 43, 44, 45};
+        int[] player2Slots = {5, 6, 7, 14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34, 35};
         for (int i = 0; i < Math.min(player2Items.length, player2Slots.length); i++) {
             if (player2Items[i] != null && !player2Items[i].getType().isAir()) {
                 inventory.setItem(player2Slots[i], player2Items[i]);
             }
         }
 
-        // Separatory
-        ItemStack separator = createItem(Material.GRAY_STAINED_GLASS_PANE,
-                ChatColor.GRAY + "Separator", null);
-        int[] separatorSlots = {13, 14, 22, 23, 31, 32, 40, 41};
-        for (int slot : separatorSlots) {
-            inventory.setItem(slot, separator);
-        }
+        // Separatory czerwono-niebieskie (środkowa kolumna)
+        ItemStack blueSeparator = createItem(Material.BLUE_STAINED_GLASS_PANE,
+                ChatColor.BLUE + "Separator", null);
+        ItemStack redSeparator = createItem(Material.RED_STAINED_GLASS_PANE,
+                ChatColor.RED + "Separator", null);
+
+        // Naprzemienne kolory w środkowej kolumnie (slot 4 ma już info)
+        inventory.setItem(13, blueSeparator);
+        inventory.setItem(22, redSeparator);
+        inventory.setItem(31, blueSeparator);
+        inventory.setItem(40, redSeparator);
+
+        // Etykiety graczy na dole
+        ItemStack player1Bottom = createItem(Material.BLUE_WOOL,
+                ChatColor.BLUE + entry.getPlayer1Name(),
+                Arrays.asList(ChatColor.GRAY + "Przedmioty po lewej stronie"));
+        inventory.setItem(36, player1Bottom);
+
+        ItemStack player2Bottom = createItem(Material.RED_WOOL,
+                ChatColor.RED + entry.getPlayer2Name(),
+                Arrays.asList(ChatColor.GRAY + "Przedmioty po prawej stronie"));
+        inventory.setItem(44, player2Bottom);
 
         // Przycisk powrotu
         ItemStack backButton = createItem(Material.ARROW,
@@ -131,7 +148,7 @@ public class TradeHistoryGUI {
         }
 
         lore.add(ChatColor.BLUE + entry.getPlayer1Name() + ": " + itemCount1 + " przedmiotów");
-        lore.add(ChatColor.GREEN + entry.getPlayer2Name() + ": " + itemCount2 + " przedmiotów");
+        lore.add(ChatColor.RED + entry.getPlayer2Name() + ": " + itemCount2 + " przedmiotów");
         lore.add("");
         lore.add(ChatColor.YELLOW + "Kliknij aby zobaczyć szczegóły");
 

@@ -142,7 +142,10 @@ public class TradeHistoryManager {
     }
 
     public List<TradeHistoryEntry> getHistory() {
-        return new ArrayList<>(historyCache);
+        List<TradeHistoryEntry> sortedHistory = new ArrayList<>(historyCache);
+        // Sortuj od najnowszych do najstarszych
+        sortedHistory.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
+        return sortedHistory;
     }
 
     public List<TradeHistoryEntry> getHistoryForPlayer(String playerName) {
@@ -153,6 +156,8 @@ public class TradeHistoryManager {
                 result.add(entry);
             }
         }
+        // Sortuj od najnowszych do najstarszych
+        result.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
         return result;
     }
 
