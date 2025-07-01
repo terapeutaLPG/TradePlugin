@@ -1,5 +1,49 @@
 # Nowe funkcje - Historia handlu i poprawki
 
+## ✅ NAJNOWSZE AKTUALIZACJE GUI HISTORII (2025-07-01):
+
+### 🎨 1. Nowy układ GUI szczegółów handlu
+- **Lewa strona (niebieska)**: Przedmioty gracza 1
+- **Prawa strona (czerwona)**: Przedmioty gracza 2  
+- **Separatory**: Czerwono-niebieskie szkło w środkowej kolumnie
+- **Etykiety**: Niebieskie i czerwone betony + wełna
+
+### 📅 2. Sortowanie historii od najnowszej
+- Historia automatycznie sortowana chronologicznie (najnowsze na początku)
+- Dotyczy zarówno pełnej historii jak i filtrowania po graczach
+- Implementowane w `TradeHistoryManager.getHistory()` i `getHistoryForPlayer()`
+
+### 🔍 3. Ulepszone filtrowanie po graczach
+- Komenda `/wymianahist nick` pokazuje tylko wymiany tego gracza
+- Dodane informacje o liczbie znalezionych zapisów  
+- Kolorowe komunikaty z potwierdzeniem działania
+
+### 🎨 4. Konsystentne kolorowanie
+- **Niebieski**: Gracz 1 w całym systemie
+- **Czerwony**: Gracz 2 w całym systemie
+- **Żółty**: Informacje i nawigacja
+- **Zielony**: Potwierdzenia i powodzenia
+
+## Nowy układ slotów w GUI szczegółów:
+
+```
+[B1] [1] [1] [I] [2] [2] [2] [R2]
+[1 ] [1] [1] [S] [2] [2] [2] [2 ]
+[1 ] [1] [1] [S] [2] [2] [2] [2 ]
+[1 ] [1] [1] [S] [2] [2] [2] [2 ]
+[E1] ...    [S] ... ... ... [E2]
+... ... ... [P] ... ... ... ...
+```
+
+**Legenda:**
+- `B1/R2` = Etykiety graczy (niebieski/czerwony beton)
+- `1` = Przedmioty gracza 1 (niebieski)
+- `2` = Przedmioty gracza 2 (czerwony)  
+- `S` = Separatory (czerwono-niebieskie szkło)
+- `I` = Informacje o handlu
+- `E1/E2` = Etykiety graczy (niebieska/czerwona wełna)
+- `P` = Przycisk powrotu
+
 ## Zrealizowane funkcje
 
 ### ✅ 1. Automatyczne zamykanie okna handlu
