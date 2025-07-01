@@ -60,7 +60,7 @@ public class InventoryListener implements Listener {
             } else if (canPlayerModifySlot(player, session, slot)) {
                 // Pozwól na naturalne przenoszenie przedmiotów
                 // NIE anulujemy eventu - pozwalamy na standardową obsługę
-                handleTradeSlotUpdate(player, session, slot);
+                handleTradeSlotUpdate(player, session);
                 return;
             } else {
                 // Zablokuj kliknięcia w inne sloty (separatory, etykiety itp.)
@@ -112,6 +112,11 @@ public class InventoryListener implements Listener {
 
         // Dodaj małe opóźnienie żeby sprawdzić czy GUI nie jest po prostu odświeżane
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            // Sprawdź czy sesja nadal istnieje
+            if (plugin.getTradeManager().getPlayerTradeSession(player) != session) {
+                return; // Sesja już nie istnieje (handel został zakończony lub anulowany)
+            }
+            
             // Sprawdź ponownie czy gracz nadal ma otwarte GUI handlu
             if (player.getOpenInventory().getTopInventory().getSize() != 54) {
                 // Gracz rzeczywiście zamknął GUI handlu
@@ -129,7 +134,7 @@ public class InventoryListener implements Listener {
         return false;
     }
 
-    private void handleTradeSlotUpdate(Player player, TradeSession session, int slot) {
+    private void handleTradeSlotUpdate(Player player, TradeSession session) {
         // Po każdej zmianie w slotach handlu, resetuj status gotowości
         session.setPlayerReady(player, false);
         session.setPlayerReady(session.getOtherPlayer(player), false);
@@ -179,12 +184,51 @@ public class InventoryListener implements Listener {
         if (!currentReady) {
             player.sendMessage(ChatColor.GREEN + "Jesteś gotowy do handlu!");
             otherPlayer.sendMessage(ChatColor.YELLOW + player.getName() + " jest gotowy!");
+            
+            // Sprawdź czy obaj gracze są teraz gotowi
+            if (session.areBothPlayersReady()) {
+                startTradeCountdown(session);
+            }
         } else {
             player.sendMessage(ChatColor.RED + "Nie jesteś już gotowy!");
             otherPlayer.sendMessage(ChatColor.YELLOW + player.getName() + " nie jest już gotowy!");
         }
 
         updateBothPlayersGUI(session);
+    }
+
+    private void startTradeCountdown(TradeSession session) {
+        Player player1 = session.getPlayer1();
+        Player player2 = session.getPlayer2();
+        
+        // Wyślij wiadomość o rozpoczęciu odliczania
+        player1.sendMessage(ChatColor.GOLD + "Obaj gracze są gotowi! Automatyczna akceptacja za 4 sekundy...");
+        player2.sendMessage(ChatColor.GOLD + "Obaj gracze są gotowi! Automatyczna akceptacja za 4 sekundy...");
+        
+        // Rozpocznij odliczanie
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            // Sprawdź czy sesja nadal istnieje i obaj gracze są gotowi
+            if (plugin.getTradeManager().getPlayerTradeSession(player1) != session || 
+                plugin.getTradeManager().getPlayerTradeSession(player2) != session) {
+                return; // Handel został anulowany
+            }
+            
+            if (!session.areBothPlayersReady()) {
+                return; // Ktoś przestał być gotowy
+            }
+            
+            // Automatycznie potwierdź dla obydwu graczy
+            session.setPlayerConfirmed(player1, true);
+            session.setPlayerConfirmed(player2, true);
+            
+            // Wyślij wiadomości
+            player1.sendMessage(ChatColor.GREEN + "Automatyczne potwierdzenie handlu!");
+            player2.sendMessage(ChatColor.GREEN + "Automatyczne potwierdzenie handlu!");
+            
+            // Zakończ handel
+            completeTrade(session);
+            
+        }, 80L); // 4 sekundy (80 ticks)
     }
 
     private void handleAcceptButton(Player player, TradeSession session) {
@@ -223,24 +267,27 @@ public class InventoryListener implements Listener {
         Player player1 = session.getPlayer1();
         Player player2 = session.getPlayer2();
 
+        // Synchronizuj najpierw przedmioty z inventory
+        syncInventoryToSession(session);
+
+        // Pobierz przedmioty do wymiany (PRZED zamknięciem GUI)
+        ItemStack[] player1Items = session.getPlayerItems(player1).clone();
+        ItemStack[] player2Items = session.getPlayerItems(player2).clone();
+
         // Zamknij GUI dla obydwu graczy
         player1.closeInventory();
         player2.closeInventory();
 
-        // Wykonaj wymianę przedmiotów
-        ItemStack[] player1Items = session.getPlayerItems(player1);
-        ItemStack[] player2Items = session.getPlayerItems(player2);
-
-        // Dodaj przedmioty do ekwipunku graczy
-        for (ItemStack item : player1Items) {
+        // Wykonaj wymianę przedmiotów - każdy gracz dostaje przedmioty DRUGIEGO gracza
+        for (ItemStack item : player2Items) { // Gracz 1 dostaje przedmioty gracza 2
             if (item != null && !item.getType().isAir()) {
-                player2.getInventory().addItem(item);
+                player1.getInventory().addItem(item.clone());
             }
         }
 
-        for (ItemStack item : player2Items) {
+        for (ItemStack item : player1Items) { // Gracz 2 dostaje przedmioty gracza 1
             if (item != null && !item.getType().isAir()) {
-                player1.getInventory().addItem(item);
+                player2.getInventory().addItem(item.clone());
             }
         }
 
