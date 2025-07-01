@@ -116,7 +116,7 @@ public class InventoryListener implements Listener {
             if (plugin.getTradeManager().getPlayerTradeSession(player) != session) {
                 return; // Sesja już nie istnieje (handel został zakończony lub anulowany)
             }
-            
+
             // Sprawdź ponownie czy gracz nadal ma otwarte GUI handlu
             if (player.getOpenInventory().getTopInventory().getSize() != 54) {
                 // Gracz rzeczywiście zamknął GUI handlu
@@ -184,7 +184,7 @@ public class InventoryListener implements Listener {
         if (!currentReady) {
             player.sendMessage(ChatColor.GREEN + "Jesteś gotowy do handlu!");
             otherPlayer.sendMessage(ChatColor.YELLOW + player.getName() + " jest gotowy!");
-            
+
             // Sprawdź czy obaj gracze są teraz gotowi
             if (session.areBothPlayersReady()) {
                 startTradeCountdown(session);
@@ -200,34 +200,34 @@ public class InventoryListener implements Listener {
     private void startTradeCountdown(TradeSession session) {
         Player player1 = session.getPlayer1();
         Player player2 = session.getPlayer2();
-        
+
         // Wyślij wiadomość o rozpoczęciu odliczania
         player1.sendMessage(ChatColor.GOLD + "Obaj gracze są gotowi! Automatyczna akceptacja za 4 sekundy...");
         player2.sendMessage(ChatColor.GOLD + "Obaj gracze są gotowi! Automatyczna akceptacja za 4 sekundy...");
-        
+
         // Rozpocznij odliczanie
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             // Sprawdź czy sesja nadal istnieje i obaj gracze są gotowi
-            if (plugin.getTradeManager().getPlayerTradeSession(player1) != session || 
-                plugin.getTradeManager().getPlayerTradeSession(player2) != session) {
+            if (plugin.getTradeManager().getPlayerTradeSession(player1) != session
+                    || plugin.getTradeManager().getPlayerTradeSession(player2) != session) {
                 return; // Handel został anulowany
             }
-            
+
             if (!session.areBothPlayersReady()) {
                 return; // Ktoś przestał być gotowy
             }
-            
+
             // Automatycznie potwierdź dla obydwu graczy
             session.setPlayerConfirmed(player1, true);
             session.setPlayerConfirmed(player2, true);
-            
+
             // Wyślij wiadomości
             player1.sendMessage(ChatColor.GREEN + "Automatyczne potwierdzenie handlu!");
             player2.sendMessage(ChatColor.GREEN + "Automatyczne potwierdzenie handlu!");
-            
+
             // Zakończ handel
             completeTrade(session);
-            
+
         }, 80L); // 4 sekundy (80 ticks)
     }
 

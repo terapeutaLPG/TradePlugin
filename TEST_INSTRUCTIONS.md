@@ -1,4 +1,4 @@
-# Test instrukcje dla TradePlugin
+# Test instrukcje dla TradePlugin - ZAKTUALIZOWANE
 
 ## Jak przetestować plugin:
 
@@ -19,21 +19,54 @@
 1. Przeciągnij przedmioty z ekwipunku NORMALNIE do slotów handlu (lewa/prawa strona)
 2. Sprawdź czy przedmioty się pojavljają u drugiego gracza
 3. Kliknij przycisk "Gotowy" (czerwony/zielony blok)
-4. Gdy obaj gracze są gotowi, kliknij "Potwierdź handel"
-5. Sprawdź czy przedmioty zostały wymienione
+4. **NOWA FUNKCJA:** Gdy obaj gracze są gotowi, **automatycznie po 4 sekundach** handel zostanie zaakceptowany!
+5. Sprawdź czy przedmioty zostały poprawnie wymienione (każdy dostaje tylko itemy drugiego gracza)
 
-### 4. Test anulowania
+### 4. Test automatycznego countdown'u (NOWA FUNKCJA!)
+
+1. Rozpocznij handel z przedmiotami
+2. Obaj gracze kliknijcie "Gotowy"
+3. **Sprawdź:** Czy pojawia się komunikat "Automatyczna akceptacja za 4 sekundy..."
+4. **Sprawdź:** Czy po 4 sekundach handel się automatycznie kończy
+5. **KRYTYCZNE:** Sprawdź czy przedmioty NIE SĄ KOPIOWANE (każdy gracz ma tylko itemy drugiego)
+
+### 5. Test przerywania countdown'u
+
+1. Obaj gracze są gotowi (zaczyna się countdown)
+2. Jeden gracz kliknie ponownie "Gotowy" (resetuje status)
+3. **Sprawdź:** Czy countdown się zatrzymuje i handel NIE zostaje wykonany
+
+### 6. Test anulowania
 
 1. Rozpocznij handel
 2. Dodaj przedmioty
 3. Kliknij "Anuluj handel" (czerwona bariera)
 4. Sprawdź czy przedmioty wróciły do ekwipunku
 
-### 5. Test rozłączenia
+### 7. Test rozłączenia
 
 1. Rozpocznij handel
 2. Jeden gracz rozłącza się
 3. Sprawdź czy drugi gracz dostał wiadomość o anulowaniu
+
+### 8. Test przeciw duplikowaniu (KRYTYCZNY!)
+
+1. Gracz A: Wklej 10 diamentów
+2. Gracz B: Wklej 5 szmaragdów
+3. Przeprowadź handel (automatyczny countdown lub ręczna akceptacja)
+4. **SPRAWDŹ BARDZO DOKŁADNIE:**
+   - Gracz A ma TYLKO 5 szmaragdów (nie ma już diamentów!)
+   - Gracz B ma TYLKO 10 diamentów (nie ma już szmaragdów!)
+   - **NIGDZIE nie ma duplikatów przedmiotów!**
+
+## Naprawione problemy:
+
+✅ **NAPRAWIONE w tej wersji:**
+
+- Kopiowanie przedmiotów (każdy gracz dostawał te same itemy)
+- Brak automatycznego countdown'u po gotowości obu graczy
+- Komunikaty o anulowaniu po udanym handlu
+- Błędy kompilacji i NullPointerException
 
 ## Możliwe problemy i rozwiązania:
 

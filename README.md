@@ -1,27 +1,26 @@
-# TradePlugin## Komendy
+# TradePlugin
 
-| Komenda              | Opis                              | Uprawnienie         |
-| -------------------- | --------------------------------- | ------------------- | ------------------------------------------------------------------- |
-| `/wymiana <gracz>`   | Rozpocznij handel z innym graczem | `tradeplugin.trade` |
-| `/wymianazaakceptuj` | Zaakceptuj prośbę o handel        | `tradeplugin.trade` |
-| `/wymianaodrzuc`     | Odrzuć prośbę o handel            | `tradeplugin.trade` | gin do handlu między graczami dla serwerów Minecraft Bukkit/Spigot. |
+Plugin do handlu między graczami dla serwerów Minecraft Bukkit/Spigot.
 
 ## Funkcje
 
 - **Bezpieczny handel** - System handlu 1v1 między graczami
-- **GUI handlu** - Intuicyjny interfejs graficzny
-- **System potwierdzeń** - Dwuetapowe potwierdzanie handlu
+- **GUI handlu** - Intuicyjny interfejs graficzny z naturalnym przeciąganiem przedmiotów
+- **System potwierdzeń** - Dwuetapowe potwierdzanie handlu z gotowością i automatycznym countdown'em
+- **Automatyczne odliczanie** - Po gotowości obu graczy automatyczna akceptacja po 4 sekundach
+- **Klikalne wiadomości** - Akceptacja/odrzucenie handlu przez kliknięcie w chat
 - **Automatyczne zwracanie przedmiotów** - W przypadku anulowania handlu
 - **Obsługa disconnectów** - Automatyczne anulowanie przy rozłączeniu gracza
+- **Zabezpieczenie przed duplikowaniem** - Przedmioty są bezpiecznie przekazywane między graczami
 - **Konfigurowalny** - Możliwość dostosowania wiadomości i ustawień
 
 ## Komendy
 
-| Komenda            | Opis                              | Uprawnienie         |
-| ------------------ | --------------------------------- | ------------------- |
-| `/wymiana <gracz>` | Rozpocznij handel z innym graczem | `tradeplugin.trade` |
-| `/wymianaakceptuj` | Zaakceptuj prośbę o handel        | `tradeplugin.trade` |
-| `/wymianaodrzuc`   | Odrzuć prośbę o handel            | `tradeplugin.trade` |
+| Komenda              | Opis                              | Uprawnienie         |
+| -------------------- | --------------------------------- | ------------------- |
+| `/wymiana <gracz>`   | Rozpocznij handel z innym graczem | `tradeplugin.trade` |
+| `/wymianazaakceptuj` | Zaakceptuj prośbę o handel        | `tradeplugin.trade` |
+| `/wymianaodrzuc`     | Odrzuć prośbę o handel            | `tradeplugin.trade` |
 
 ## Uprawnienia
 
@@ -33,11 +32,14 @@
 ## Jak używać
 
 1. **Rozpoczęcie handlu**: Użyj komendy `/wymiana <nick_gracza>` aby wysłać prośbę o handel
-2. **Akceptacja**: Gracz docelowy używa `/wymianazaakceptuj` aby zaakceptować lub `/wymianaodrzuc` aby odrzucić (lub kliknie w chat!)
-3. **Dodawanie przedmiotów**: Po otwarciu GUI, przeciągnij przedmioty normalnie do slotów handlu
-4. **Potwierdzenie gotowości**: Kliknij zielony/czerwony przycisk aby zaznaczyć gotowość
-5. **Finalizacja**: Gdy obaj gracze są gotowi, kliknij przycisk potwierdzenia
-6. **Zakończenie**: Handel zostanie wykonany automatycznie po potwierdzeniu przez obydwu graczy
+2. **Akceptacja**: Gracz docelowy może:
+   - Kliknąć **[ZAAKCEPTUJ]** lub **[ODRZUĆ]** w wiadomości na czacie
+   - Użyć komendy `/wymianazaakceptuj` lub `/wymianaodrzuc`
+3. **Dodawanie przedmiotów**: Po otwarciu GUI, przeciągnij przedmioty normalnie do swoich slotów handlu
+4. **Potwierdzenie gotowości**: Kliknij przycisk gotowości (czerwony → zielony)
+5. **Automatyczne odliczanie**: Gdy obaj gracze są gotowi, rozpoczyna się 4-sekundowe odliczanie
+6. **Finalizacja**: Po 4 sekundach handel zostanie automatycznie wykonany
+7. **Anulowanie**: W każdej chwili można anulować handel przyciskiem lub zamknięciem GUI
 
 ## GUI Handlu
 
@@ -47,9 +49,19 @@
 │                       │                             │
 │ [Gotowy?]             │                   [Gotowy?] │
 │                       │                             │
-│        [Anuluj]   [Potwierdź]                       │
+│        [Anuluj]                                     │
 └─────────────────────────────────────────────────────┘
 ```
+
+### Automatyczne funkcje:
+
+- **Resetowanie gotowości** - Po każdej zmianie przedmiotów
+- **4-sekundowy countdown** - Po gotowości obu graczy
+- **Automatyczne zakończenie** - Bez konieczności klikania "Potwierdź"
+- **Bezpieczna wymiana** - Każdy gracz dostaje tylko przedmioty drugiego gracza
+  └─────────────────────────────────────────────────────┘
+
+````
 
 ## Instalacja
 
@@ -68,7 +80,7 @@ settings:
   max-trade-distance: 10.0 # Maksymalna odległość do handlu
   allow-cross-world-trade: false # Handel między światami
   log-trades: true # Logowanie handlu
-```
+````
 
 ## Budowanie
 
