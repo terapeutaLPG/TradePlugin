@@ -1,0 +1,108 @@
+# ===========================================
+# TradePlugin - Konfiguracja
+# ===========================================
+
+# Ustawienia ogólne
+settings:
+  # Czas na odpowiedź na prośbę o handel (w sekundach)
+  request-timeout: 60
+
+  # Maksymalna odległość między graczami do handlu
+  max-trade-distance: 10.0
+
+  # Czy pozwolić na handel między światami
+  allow-cross-world-trade: false
+
+  # Czy zapisywać logi handlu
+  log-trades: true
+
+# Wiadomości
+messages:
+  # Prefix dla wszystkich wiadomości
+  prefix: "&8[&6Trade&8] &f"
+
+  # Komendy
+  only-players: "&cTylko gracze mogą używać tej komendy!"
+  usage-trade: "&cUżycie: /trade <gracz>"
+
+  # Błędy handlu
+  already-in-trade: "&cJesteś już w trakcie handlu!"
+  player-offline: "&cGracz nie jest online!"
+  self-trade: "&cNie możesz handlować sam ze sobą!"
+  target-in-trade: "&cTen gracz jest już w trakcie handlu!"
+  already-sent-request: "&cMasz już wysłaną prośbę o handel!"
+  request-already-exists: "&cJuż wysłałeś prośbę o handel do tego gracza!"
+  too-far-away: "&cJesteś za daleko od tego gracza!"
+  different-worlds: "&cNie możesz handlować z graczami z innych światów!"
+
+  # Prośby o handel
+  request-sent: "&aWysłano prośbę o handel do &e{player}"
+  request-received: "&e{player} &achce z Tobą handlować!"
+  request-accept-deny: "&aWpisz &2/tradeaccept &aaby zaakceptować lub &c/tradedeny &aaby odrzucić"
+
+  no-pending-request: "&cNie masz żadnych próśb o handel!"
+  request-expired: "&cProśba o handel wygasła!"
+  requester-offline: "&cGracz, który wysłał prośbę, nie jest już online!"
+
+  # Akceptacja/odrzucenie
+  trade-accepted: "&aZaakceptowałeś handel z &e{player}"
+  trade-accepted-by: "&e{player} &azaakceptował handel!"
+  trade-denied: "&aOdrzuciłeś prośbę o handel od &e{player}"
+  trade-denied-by: "&e{player} &codrzucił Twoją prośbę o handel!"
+
+  # Status handlu
+  ready: "&aJesteś gotowy do handlu!"
+  not-ready: "&cNie jesteś już gotowy!"
+  other-ready: "&e{player} &ajest gotowy!"
+  other-not-ready: "&e{player} &cnie jest już gotowy!"
+
+  confirmed: "&aPotwierdziłeś handel!"
+  confirmation-cancelled: "&cAnulowałeś potwierdzenie!"
+  other-confirmed: "&e{player} &apotwierdził handel!"
+  other-confirmation-cancelled: "&e{player} &canulował potwierdzenie!"
+
+  both-must-be-ready: "&cObaj gracze muszą być gotowi!"
+
+  # Zakończenie handlu
+  trade-completed: "&aHandel zakończony pomyślnie!"
+  trade-cancelled: "&cHandel anulowany: &f{reason}"
+
+  # Powody anulowania
+  cancel-reasons:
+    player-quit: "{player} opuścił serwer"
+    window-closed: "{player} zamknął okno handlu"
+    player-cancelled: "{player} anulował handel"
+    timeout: "przekroczono czas oczekiwania"
+
+# GUI
+gui:
+  title: "&2Handel"
+
+  # Przyciski
+  buttons:
+    ready:
+      name-ready: "&aGotowy!"
+      name-not-ready: "&cNie gotowy"
+      lore: "&7Kliknij aby zmienić status gotowości"
+
+    other-ready:
+      name-ready: "&a{player} jest gotowy"
+      name-not-ready: "&c{player} nie jest gotowy"
+
+    confirm:
+      name-confirmed: "&aPotwierdzono!"
+      name-not-confirmed: "&ePotwierź handel"
+      lore: "&7Kliknij aby potwierdzić handel"
+
+    waiting:
+      name: "&7Czekaj na gotowość"
+      lore: "&7Obaj gracze muszą być gotowi"
+
+    cancel:
+      name: "&cAnuluj handel"
+      lore: "&7Kliknij aby anulować handel"
+
+  # Etykiety graczy
+  player-labels:
+    your-items: "&9Twoje przedmioty"
+    other-items: "&9Przedmioty gracza {player}"
